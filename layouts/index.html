@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Colorful Input and Mouse Tracer</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #eee;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #output {
+            font-size: 2em;
+        }
+
+        #instructions {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            font-size: 1.5em;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: black;
+            background-color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            animation: explosion 2s cubic-bezier(.36,.07,.19,.97) forwards;
+        }
+
+        .mouse-tracer {
+            position: absolute;
+            border-radius: 50%;
+            animation: tracer 1s ease-out forwards;
+        }
+
+        @keyframes explosion {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes tracer {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="output">Start typing</div>
+    <div id="instructions">
+        <!-- Instructions will be updated dynamically based on the user's browser -->
+    </div>
+
+    <script>
+        (function() {
+            const output = document.getElementById('output');
+            const instructions = document.getElementById('instructions');
+
+            function getRandomColor() {
+                let letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            function getRandomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            function createExplosion() {
+                let circle = document.createElement('div');
+                circle.className = 'circle';
+                circle.style.width = circle.style.height = (Math.random() * 100 + 50) + 'px';
+                circle.style.left = getRandomInRange(0, window.innerWidth - 150) + 'px'; 
+                circle.style.top = getRandomInRange(0, window.innerHeight - 150) + 'px';
+                circle.style.backgroundColor = getRandomColor();
+                document.body.appendChild(circle);
+
+                setTimeout(function() {
+                    document.body.removeChild(circle);
+                }, 2000);
+            }
+
+            function createTracer(e) {
+                let tracer = document.createElement('div');
+                tracer.className = 'mouse-tracer';
+                tracer.style.width = tracer.style.height = '20px';
+                tracer.style.left = e.pageX + 'px';
+                tracer.style.top = e.pageY + 'px';
+                tracer.style.backgroundColor = getRandomColor();
+                document.body.appendChild(tracer);
+
+                setTimeout(function() {
+                    document.body.removeChild(tracer);
+                }, 1000);
+            }
+
+            document.onkeydown = function(e) {
+                if (e.key.length === 1) {
+                    if(output.textContent === "Start typing"){
+                        output.textContent = '';
+                    }
+
+                    let letter = document.createElement('span');
+                    letter.textContent = e.key;
+                    letter.style.color = getRandomColor();
+                    output.appendChild(letter);
+                    createExplosion();
+                } else if (e.key === 'Backspace') {
+                    if (output.lastChild) {
+                        output.removeChild(output.lastChild);
+                    }
+                } else if (e.key === 'Enter') {
+                    output.appendChild(document.createElement('br'));
+                }
+            };
+
+            document.onmousemove = function(e) {
+                createTracer(e);
+            };
+
+            // Determine the user's browser and show the relevant instructions
+            let isFirefox = typeof InstallTrigger !== 'undefined';
+            let isMacOS = navigator.platform.toUpperCase().includes('MAC');
+
+            if (isFirefox && !isMacOS) {
+                instructions.textContent = 'Press F11 to toggle Full Screen mode.';
+            } else {  
+                instructions.textContent = 'Press Control + Command + F to toggle Full Screen mode.';
+            }
+        })();
+    </script>
+</body>
+</html>
