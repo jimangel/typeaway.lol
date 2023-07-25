@@ -24,7 +24,7 @@
             left: 0;
             width: 100%;
             font-size: 1.5em;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Comic Sans MS', sans-serif;
             color: black;
             background-color: rgba(255, 255, 255, 0.5);
             text-align: center;
@@ -120,6 +120,18 @@
             }
 
             document.onkeydown = function(e) {
+                if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) {
+                    // Prevents key combinations
+                    e.preventDefault();
+                    return;
+                }
+
+                // Prevents caps lock, escape, function keys, etc.
+                if (e.keyCode < 32 || (e.keyCode >= 112 && e.keyCode <= 123)) {
+                    e.preventDefault();
+                    return;
+                }
+
                 if (e.key.length === 1) {
                     if(output.textContent === "Start typing"){
                         output.textContent = '';
@@ -141,6 +153,11 @@
 
             document.onmousemove = function(e) {
                 createTracer(e);
+            };
+
+            // Prevent clicks on the page
+            document.onclick = function(e) {
+                e.preventDefault();
             };
 
             // Determine the user's browser and show the relevant instructions
